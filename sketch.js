@@ -9,6 +9,12 @@ let poseNet;
 let pose;
 let skeleton;
 
+let ballLocation = [0, 250];
+let ballAngle = 0;
+
+let leftBar = 0;
+let rightBar = 0;
+
 function setup() {
     createCanvas(640, 480);
     video = createCapture(VIDEO);
@@ -30,8 +36,38 @@ function modelLoaded() {
     console.log('poseNet ready');
 }
 
+function bounceBall() {
+    ballAngle + PI
+}
+
+function collisionDetector() {
+    // check if hits wall
+    ballX = ballLocation[0];
+    ballY = ballLocation[1];
+
+    if (ballY + 5 === 480 || ballY - 5 === 0) {
+        bounceBall();
+    } else if (ballX = 5 === rightBar || ballX - 5 === leftBar) {
+        bounceBall();
+    }
+}
+
 function draw() {
+    // flip camera
+    translate(video.width, 0);
+    scale(-1, 1);
     image(video, 0, 0);
+
+    console.log("HELLO");
+    setTimeout(function () {
+        collisionDetector()
+        y = Math.sin(ballAngle) + ballLocation[1];
+        x = Math.cos(ballAngle) + ballLocation[0];
+        ballLocation = [x, y];
+        leftBar = 0;
+        rightBar = 0;
+    }, 100);
+    console.log("DOG");
 
     if (pose) {
         let eyeR = pose.rightEye;
@@ -40,8 +76,11 @@ function draw() {
         fill(255, 0, 0);
         ellipse(pose.nose.x, pose.nose.y, d);
         fill(0, 0, 255);
-        ellipse(pose.rightWrist.x, pose.rightWrist.y, 32);
-        ellipse(pose.leftWrist.x, pose.leftWrist.y, 32);
+        square(20, (pose.rightWrist.y - 50), 32);
+        square(550, (pose.leftWrist.y - 50), 32);
+
+        ellipse(ballLocation[0], ballLocation[1], 32);
+
 
         for (let i = 0; i < pose.keypoints.length; i++) {
             let x = pose.keypoints[i].position.x;
